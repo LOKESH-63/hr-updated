@@ -139,7 +139,7 @@ def build_rag_pipeline(pdf_path: str):
     llm = AzureChatOpenAI(
         azure_deployment=AZURE_CHAT_DEPLOYMENT,
         api_version=OPENAI_API_VERSION,
-        temperature=0.0
+        temperature=0.8
     )
 
     prompt = PromptTemplate(
