@@ -26,13 +26,15 @@ def login_ui():
             st.session_state.username = "hr"
             st.session_state.role = "HR"
             st.rerun()
+
         elif username == "employee" and password == "emp123":
             st.session_state.logged_in = True
             st.session_state.username = "employee"
             st.session_state.role = "Employee"
             st.rerun()
+
         else:
-            st.error("Invalid credentials")
+            st.error("❌ Invalid username or password")
 
 # ---------------- LOGOUT ----------------
 def logout_ui():
@@ -44,36 +46,36 @@ def logout_ui():
 # ---------------- AUTH FLOW ----------------
 if not st.session_state.logged_in:
     login_ui()
-    st.stop()   # stop ONLY after login UI renders
+    st.stop()   # STOP after rendering login
 
 # ---------------- SIDEBAR ----------------
 st.sidebar.title("👤 User Info")
-st.sidebar.write(f"Username: {st.session_state.username}")
-st.sidebar.write(f"Role: {st.session_state.role}")
+st.sidebar.write(f"**Username:** {st.session_state.username}")
+st.sidebar.write(f"**Role:** {st.session_state.role}")
 logout_ui()
 
 st.divider()
 
-# ---------------- LOAD RAG (LAZY + SAFE) ----------------
+# ---------------- LOAD RAG (LAZY & SAFE) ----------------
 @st.cache_resource(show_spinner=True)
-def load_rag():
+def load_rag_pipeline():
     from rag_pipeline import build_rag_pipeline
     return build_rag_pipeline("Sample_HR_Policy_Document.pdf")
 
 if "rag_chain" not in st.session_state:
-    st.session_state.rag_chain = load_rag()
+    st.session_state.rag_chain = load_rag_pipeline()
 
 # ---------------- CHAT UI ----------------
 st.subheader("💬 Ask an HR Question")
 
 question = st.text_input(
-    "Type your question",
+    "Enter your question",
     placeholder="Example: What is the leave policy?"
 )
 
 if st.button("Ask"):
     if not question.strip():
-        st.warning("Please enter a question")
+        st.warning("Please enter a question.")
     else:
         with st.spinner("🤖 Thinking..."):
             answer = st.session_state.rag_chain.invoke(question)
@@ -85,4 +87,4 @@ if st.button("Ask"):
 if st.session_state.role == "HR":
     st.divider()
     st.subheader("🛠 HR Admin Panel")
-    st.info("HR-only features will appear here")
+    st.info("HR-only features (PDF upload, analytics) can be added here.")
